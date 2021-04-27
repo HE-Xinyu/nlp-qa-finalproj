@@ -4,7 +4,7 @@ Example command to train the (medium-sized) baseline model on SQuAD
 with a GPU, and write its predictions to an output file:
 
 Usage:
-    python3 main.py \
+    python3.7 main.py \
         --use_gpu \
         --model "baseline" \
         --model_path "squad_model.pt" \
@@ -428,7 +428,7 @@ def write_predictions(args, model, dataset):
                 start_probs = unpack(batch_start_probs[j])
                 end_probs = unpack(batch_end_probs[j])
                 start_index, end_index = search_span_endpoints(
-                        start_probs, end_probs
+                        start_probs, end_probs, passage
                 )
                 
                 # Grab predicted span.

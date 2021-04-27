@@ -11,7 +11,9 @@ import pickle
 
 import torch
 from tqdm import tqdm
+import spacy
 
+nlp = spacy.load("en_core_web_sm")
 
 def cuda(args, tensor):
     """
@@ -105,7 +107,27 @@ def load_embeddings(path):
     return embedding_map
 
 
-def search_span_endpoints(start_probs, end_probs, window=15):
+def get_start_end_indices(passage):
+    sentence = " ".join(passage)
+    start_idx_to_token_idx = {}
+    end_idx_to_token_idx = {}
+
+    cur = 0
+    for i in range(len(passage)):
+        start_idx_to_token_idx[cur] = i
+        end_idx_to_token_idx[cur + len(passage[i])] = i
+        cur += len(passage[i]) + 1
+
+    doc = nlp(sentence)
+    ret = []
+
+    for ent in doc.ents:
+        ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char]])
+
+    return ret
+
+
+def search_span_endpoints(start_probs, end_probs, passage, window=15):
     """
     Finds an optimal answer span given start and end probabilities.
     Specifically, this algorithm finds the optimal start probability p_s, then
@@ -124,12 +146,30 @@ def search_span_endpoints(start_probs, end_probs, window=15):
         Optimal starting and ending indices for the answer span. Note that the
         chosen end index is *inclusive*.
     """
-    max_start_index = start_probs.index(max(start_probs))
+    entity_indices = get_start_end_indices(passage)
+    invalid_start_indices = set()
+    invalid_end_indices = set()
+
+    for entity_index in entity_indices:
+        start, end = entity_index
+        for i in range(start + 1, end + 1):
+            invalid_start_indices.add(i)
+        
+        for j in range(start, end):
+            invalid_end_indices.add(j)
+
+    max_start_idx = -1
+    max_start_prob = min(start_probs)
+    for i in range(len(start_probs)):
+        if i not in invalid_start_indices and start_probs[i] > max_start_prob:
+            max_start_idx = i
+            max_start_prob = start_probs[i]
+
     max_end_index = -1
     max_joint_prob = 0.
 
     for end_index in range(len(end_probs)):
-        if max_start_index <= end_index <= max_start_index + window:
+        if max_start_index <= end_index <= max_start_index + window and end_index not in invalid_end_indices:
             joint_prob = start_probs[max_start_index] * end_probs[end_index]
             if joint_prob > max_joint_prob:
                 max_joint_prob = joint_prob
