@@ -122,7 +122,16 @@ def get_start_end_indices(passage):
     ret = []
 
     for ent in doc.ents:
-        ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char]])
+        try:
+            ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char]])
+        except:
+            print(passage)
+            print(doc.ents)
+            print(ent.start_char)
+            print(ent.end_char)
+            print(start_idx_to_token_idx)
+            print(end_idx_to_token_idx)
+            raise
 
     return ret
 
