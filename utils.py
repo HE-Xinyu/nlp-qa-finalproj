@@ -158,11 +158,11 @@ def search_span_endpoints(start_probs, end_probs, passage, window=15):
         for j in range(start, end):
             invalid_end_indices.add(j)
 
-    max_start_idx = -1
+    max_start_index = -1
     max_start_prob = min(start_probs)
     for i in range(len(start_probs)):
         if i not in invalid_start_indices and start_probs[i] > max_start_prob:
-            max_start_idx = i
+            max_start_index = i
             max_start_prob = start_probs[i]
 
     max_end_index = -1
