@@ -121,10 +121,18 @@ def get_start_end_indices(passage):
     doc = nlp(sentence)
     ret = []
 
+    first_time = True
+
     for ent in doc.ents:
         try:
             ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char]])
         except:
+            if first_time:
+                print(sentence)
+                print(ent.start_char, ent.end_char)
+                print(start_idx_to_token_idx)
+                print(end_idx_to_token_idx)
+                first_time = False
             pass
 
     return ret
