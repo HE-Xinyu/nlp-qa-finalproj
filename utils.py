@@ -115,7 +115,7 @@ def get_start_end_indices(passage):
     cur = 0
     for i in range(len(passage)):
         start_idx_to_token_idx[cur] = i
-        end_idx_to_token_idx[cur + len(passage[i])] = i
+        end_idx_to_token_idx[cur + len(passage[i]) - 1] = i
         cur += len(passage[i]) + 1
 
     doc = nlp(sentence)
