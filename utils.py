@@ -125,7 +125,10 @@ def get_start_end_indices(passage):
 
     for ent in doc.ents:
         try:
-            ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char]])
+            if ent.end_char in end_idx_to_token_idx:
+                ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char]])
+            else:
+                ret.append([start_idx_to_token_idx[ent.start_char], end_idx_to_token_idx[ent.end_char - 1]])
         except:
             if first_time:
                 print(sentence)
