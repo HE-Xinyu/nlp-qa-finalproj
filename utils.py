@@ -206,7 +206,7 @@ def search_span_endpoints(start_probs, end_probs, passage, question, window=15, 
     search_range = get_search_range(passage, question, context_length)
     assert(len(search_range) != 0)
 
-    if len(start_probs) != len(passage):
+    if len(start_probs) < len(passage):
         print("len1 = ", len(start_probs), "len2 = ", len(passage))
         print(start_probs)
         print(passage)
