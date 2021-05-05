@@ -168,7 +168,7 @@ def get_search_range(passage, question, context_length):
             if idx + k >= 0 and idx + k < len(passage):
                 ret.add(idx + k)
             if idx - k >= 0 and idx - k < len(passage):
-                ret.add(idx + k)
+                ret.add(idx - k)
 
     return sorted(ret)
 
