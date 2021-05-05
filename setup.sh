@@ -20,10 +20,10 @@ $WGET_CMD https://s3.us-east-2.amazonaws.com/mrqa/release/v2/dev/NewsQA.jsonl.gz
 $WGET_CMD http://participants-area.bioasq.org/MRQA2019/ $SAVE_TO_ARG datasets/bioasq.jsonl.gz
 $WGET_CMD http://cs.utexas.edu/~gdurrett/courses/fa2020/squad_dev_addOneSent_mrqa.json.gz $SAVE_TO_ARG datasets/squad_adversarial_addonesent.jsonl.gz
 
-$WGET_CMD http://downloads.cs.stanford.edu/nlp/data/wordvecs/glove.6B.zip $SAVE_ARG
-unzip glove.6B.zip
-mv glove.6B.*.txt glove/
-rm glove.6B.zip
+# $WGET_CMD http://downloads.cs.stanford.edu/nlp/data/wordvecs/glove.6B.zip $SAVE_ARG
+# unzip glove.6B.zip
+# mv glove.6B.*.txt glove/
+# rm glove.6B.zip
 
 $WGET_CMD https://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/BioSentVec/BioWordVec_PubMed_MIMICIII_d200.vec.bin $SAVE_ARG 
 
