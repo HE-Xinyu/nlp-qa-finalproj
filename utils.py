@@ -149,9 +149,14 @@ def get_search_range(passage, question, context_length):
     start_indices = []
     for ent in question_doc.ents:
         if ent.text in sentence_passage:
+            found = False
             for idx, word in enumerate(passage):
                 if ent.text.startswith(word):
                     start_indices.append(idx)
+                    found = True
+            
+            if not found:
+                print("Cannot find", ent.text, "in", passage)
 
     if len(start_indices) == 0:
         # no entities. search all the passages.
@@ -187,7 +192,7 @@ def search_span_endpoints(start_probs, end_probs, passage, question, window=15, 
         Optimal starting and ending indices for the answer span. Note that the
         chosen end index is *inclusive*.
     """
-    entity_indices = get_start_end_indices(passage)
+    # entity_indices = get_start_end_indices(passage)
     # invalid_start_indices = set()
     # invalid_end_indices = set()
 
@@ -199,12 +204,13 @@ def search_span_endpoints(start_probs, end_probs, passage, question, window=15, 
     #     for j in range(start, end):
     #         invalid_end_indices.add(j)
     search_range = get_search_range(passage, question, context_length)
+    assert(len(search_range) != 0)
 
 
     max_start_index = -1
     max_start_prob = min(start_probs)
     for i in search_range:
-        if i not in invalid_start_indices and start_probs[i] > max_start_prob:
+        if start_probs[i] > max_start_prob:
             max_start_index = i
             max_start_prob = start_probs[i]
 
@@ -212,7 +218,7 @@ def search_span_endpoints(start_probs, end_probs, passage, question, window=15, 
     max_joint_prob = 0.
 
     for end_index in search_range:
-        if max_start_index <= end_index <= max_start_index + window and end_index not in invalid_end_indices:
+        if max_start_index <= end_index <= max_start_index + window:
             joint_prob = start_probs[max_start_index] * end_probs[end_index]
             if joint_prob > max_joint_prob:
                 max_joint_prob = joint_prob
