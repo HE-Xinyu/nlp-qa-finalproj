@@ -480,7 +480,7 @@ def main(args):
 
     # Select model.
     model = _select_model(args)
-    num_pretrained = model.load_pretrained_embeddings(
+    num_pretrained = model.load_pretrained_embeddings_bio(
         vocabulary, args.embedding_path
     )
     pct_pretrained = round(num_pretrained / len(vocabulary) * 100., 2)

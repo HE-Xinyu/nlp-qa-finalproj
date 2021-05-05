@@ -11,6 +11,8 @@ import torch.nn.functional as F
 from utils import cuda, load_cached_embeddings
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
+from gensim.models import KeyedVectors
+
 
 def _sort_batch_by_length(tensor, sequence_lengths):
     """
@@ -238,6 +240,23 @@ class BaselineReader(nn.Module):
                 num_pretrained += 1
 
         # Place embedding matrix on GPU.
+        self.embedding.weight.data = cuda(self.args, embeddings)
+
+        return num_pretrained
+    
+    def load_pretrained_embeddings_bio(self, vocabulary, path):
+        model = KeyedVectors.load_word2vec_format(path, binary=True)
+        
+        embeddings = torch.zeros(
+            (len(vocabulary), self.args.embedding_dim)
+        ).uniform_(-0.1, 0.1)
+
+        num_pretrained = 0
+        for (i, word) in enumerate(vocabulary.words):
+            if word in model:
+                embeddings[i] = torch.tensor(model[word])
+                num_pretrained += 1
+
         self.embedding.weight.data = cuda(self.args, embeddings)
 
         return num_pretrained
