@@ -173,7 +173,7 @@ def get_search_range(passage, question, context_length):
     return sorted(ret)
 
 
-def search_span_endpoints(start_probs, end_probs, passage, question, window=15, context_length=15):
+def search_span_endpoints(start_probs, end_probs, passage, question, window=15, context_length=12):
     """
     Finds an optimal answer span given start and end probabilities.
     Specifically, this algorithm finds the optimal start probability p_s, then
