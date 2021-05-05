@@ -25,5 +25,7 @@ unzip glove.6B.zip
 mv glove.6B.*.txt glove/
 rm glove.6B.zip
 
+$WGET_CMD https://ftp.ncbi.nlm.nih.gov/pub/lu/Suppl/BioSentVec/BioWordVec_PubMed_MIMICIII_d200.vec.bin $SAVE_ARG 
+
 echo
 echo "done!"
