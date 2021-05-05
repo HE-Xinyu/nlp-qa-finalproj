@@ -141,7 +141,34 @@ def get_start_end_indices(passage):
     return ret
 
 
-def search_span_endpoints(start_probs, end_probs, passage, window=15):
+def get_search_range(passage, question, context_length):
+    sentence_passage = " ".join(passage)
+    sentence_question = " ".join(question)
+    question_doc = nlp(sentence_question)
+
+    start_indices = []
+    for ent in question_doc.ents:
+        if ent.text in sentence_passage:
+            for idx, word in enumerate(passage):
+                if ent.text.startswith(word):
+                    start_indices.append(idx)
+
+    if len(start_indices) == 0:
+        # no entities. search all the passages.
+        return list(range(len(passage)))
+
+    ret = set()
+    for idx in start_indices:
+        for k in range(context_length):
+            if idx + k >= 0 and idx + k < len(passage):
+                ret.add(idx + k)
+            if idx - k >= 0 and idx - k < len(passage):
+                ret.add(idx + k)
+
+    return sorted(ret)
+
+
+def search_span_endpoints(start_probs, end_probs, passage, question, window=15, context_length=15):
     """
     Finds an optimal answer span given start and end probabilities.
     Specifically, this algorithm finds the optimal start probability p_s, then
@@ -161,20 +188,22 @@ def search_span_endpoints(start_probs, end_probs, passage, window=15):
         chosen end index is *inclusive*.
     """
     entity_indices = get_start_end_indices(passage)
-    invalid_start_indices = set()
-    invalid_end_indices = set()
+    # invalid_start_indices = set()
+    # invalid_end_indices = set()
 
-    for entity_index in entity_indices:
-        start, end = entity_index
-        for i in range(start + 1, end + 1):
-            invalid_start_indices.add(i)
+    # for entity_index in entity_indices:
+    #     start, end = entity_index
+    #     for i in range(start + 1, end + 1):
+    #         invalid_start_indices.add(i)
         
-        for j in range(start, end):
-            invalid_end_indices.add(j)
+    #     for j in range(start, end):
+    #         invalid_end_indices.add(j)
+    search_range = get_search_range(passage, question, context_length)
+
 
     max_start_index = -1
     max_start_prob = min(start_probs)
-    for i in range(len(start_probs)):
+    for i in search_range:
         if i not in invalid_start_indices and start_probs[i] > max_start_prob:
             max_start_index = i
             max_start_prob = start_probs[i]
@@ -182,7 +211,7 @@ def search_span_endpoints(start_probs, end_probs, passage, window=15):
     max_end_index = -1
     max_joint_prob = 0.
 
-    for end_index in range(len(end_probs)):
+    for end_index in search_range:
         if max_start_index <= end_index <= max_start_index + window and end_index not in invalid_end_indices:
             joint_prob = start_probs[max_start_index] * end_probs[end_index]
             if joint_prob > max_joint_prob:
